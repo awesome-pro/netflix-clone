@@ -180,7 +180,7 @@ export const Card = ({
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [open]);
 
-  useOutsideClick(containerRef, () => handleClose());
+  useOutsideClick(containerRef as React.RefObject<HTMLDivElement>, () => handleClose());
 
   const handleOpen = () => {
     setOpen(true);
