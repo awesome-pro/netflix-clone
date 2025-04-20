@@ -7,7 +7,7 @@ export default function Iphone() {
         <TextGenerateEffect words="Watch on Any Device from anywhere" className="text-gradient-premium"/>
       <Iphone15Pro
         className="w-[90vw] -rotate-90"
-        videoSrc="https://videos.pexels.com/video-files/8946986/8946986-uhd_1440_2732_25fps.mp4"
+        videoSrc="/dog.mp4"
       />
     </div>
   );

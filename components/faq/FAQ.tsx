@@ -36,7 +36,7 @@ export function FAQ() {
                 <AccordionItem 
                   key={index} 
                   value={`item-${index}`}
-                  className="border-none mb-2"
+                  className="border-none mb-2 rounded-2xl"
                 >
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}
@@ -47,7 +47,7 @@ export function FAQ() {
                     <AccordionTrigger className="bg-[#1a1b1d] hover:bg-[#1c1d1d] py-5 px-6 text-xl md:text-2xl font-medium rounded-2xl">
                       {faq.question}
                     </AccordionTrigger>
-                    <AccordionContent className="bg-[#1f2022] mt-px px-6 py-5 text-lg md:text-xl">
+                    <AccordionContent className="bg-[#1f2022] mt-px px-6 py-5 text-lg md:text-xl rounded-2xl">
                       {faq.answer}
                     </AccordionContent>
                   </motion.div>
