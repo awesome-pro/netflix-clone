@@ -23,6 +23,10 @@ type Card = {
   title: string;
   category: string;
   content: React.ReactNode;
+  year?: string;
+  duration?: string;
+  rating?: string;
+  description?: string;
 };
 
 export const CarouselContext = createContext<{
@@ -160,6 +164,7 @@ export const Card = ({
   layout?: boolean;
 }) => {
   const [open, setOpen] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const { onCardClose, currentIndex } = useContext(CarouselContext);
 
@@ -218,7 +223,7 @@ export const Card = ({
               </button>
               <motion.p
                 layoutId={layout ? `category-${card.title}` : undefined}
-                className="text-base font-medium text-black dark:text-white"
+                className="text-base font-medium text-red-600 dark:text-red-500"
               >
                 {card.category}
               </motion.p>
@@ -228,6 +233,23 @@ export const Card = ({
               >
                 {card.title}
               </motion.p>
+              
+              {(card.year || card.duration || card.rating) && (
+                <div className="mt-4 flex items-center gap-3 text-neutral-500 dark:text-neutral-400">
+                  {card.year && <span>{card.year}</span>}
+                  {card.year && card.duration && <span>•</span>}
+                  {card.duration && <span>{card.duration}</span>}
+                  {(card.year || card.duration) && card.rating && <span>•</span>}
+                  {card.rating && <span className="px-1 border border-neutral-500 text-xs">{card.rating}</span>}
+                </div>
+              )}
+              
+              {card.description && (
+                <p className="mt-6 text-neutral-600 dark:text-neutral-300 text-base">
+                  {card.description}
+                </p>
+              )}
+              
               <div className="py-10">{card.content}</div>
             </motion.div>
           </div>
@@ -236,28 +258,67 @@ export const Card = ({
       <motion.button
         layoutId={layout ? `card-${card.title}` : undefined}
         onClick={handleOpen}
-        className="relative z-10 flex h-80 w-32 flex-col items-start justify-start overflow-hidden rounded-3xl bg-gray-100 md:h-[28rem] md:w-96 dark:bg-neutral-900"
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        className="relative z-10 flex h-60 w-40 flex-col items-start justify-start overflow-hidden rounded-md bg-gray-100 transition-all duration-300 md:h-[22rem] md:w-64 dark:bg-neutral-900 group"
+        style={{
+          transform: isHovered ? 'scale(1.05)' : 'scale(1)',
+          boxShadow: isHovered ? '0 10px 25px -5px rgba(0, 0, 0, 0.3)' : 'none'
+        }}
       >
-        <div className="pointer-events-none absolute inset-x-0 top-0 z-30 h-full bg-gradient-to-b from-black/50 via-transparent to-transparent" />
-        <div className="relative z-40 p-8">
-          <motion.p
-            layoutId={layout ? `category-${card.category}` : undefined}
-            className="text-left font-sans text-sm font-medium text-white md:text-base"
-          >
-            {card.category}
-          </motion.p>
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-30 h-2/3 bg-gradient-to-t from-black/90 via-black/60 to-transparent" />
+        
+        {/* Play button that appears on hover */}
+        <div 
+          className={`absolute inset-0 z-40 flex items-center justify-center opacity-0 transition-opacity duration-300 ${isHovered ? 'opacity-100' : ''}`}
+        >
+          <div className="rounded-full bg-red-600 p-3 hover:bg-red-700 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white">
+              <polygon points="5 3 19 12 5 21 5 3"></polygon>
+            </svg>
+          </div>
+        </div>
+        
+        {/* Info badge that appears on hover */}
+        <div 
+          className={`absolute bottom-2 right-2 z-40 rounded-full bg-black/60 p-2 opacity-0 transition-opacity duration-300 ${isHovered ? 'opacity-100' : ''}`}
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="16" x2="12" y2="12"></line>
+            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+          </svg>
+        </div>
+        
+        <div className="absolute bottom-0 left-0 right-0 z-40 p-4">
           <motion.p
             layoutId={layout ? `title-${card.title}` : undefined}
-            className="mt-2 max-w-xs text-left font-sans text-xl font-semibold [text-wrap:balance] text-white md:text-3xl"
+            className="text-left font-sans text-sm font-semibold text-white md:text-lg"
           >
             {card.title}
           </motion.p>
+          
+          {(card.year || card.rating) && (
+            <div className="mt-1 flex items-center gap-2 text-xs text-gray-300">
+              {card.year && <span>{card.year}</span>}
+              {card.year && card.rating && <span>•</span>}
+              {card.rating && <span className="border border-gray-500 px-1 text-[10px]">{card.rating}</span>}
+            </div>
+          )}
+          
+          <motion.p
+            layoutId={layout ? `category-${card.category}` : undefined}
+            className="mt-1 text-left font-sans text-xs text-red-500 md:text-sm"
+          >
+            {card.category}
+          </motion.p>
         </div>
+        
         <BlurImage
           src={card.src}
           alt={card.title}
           fill
-          className="absolute inset-0 z-10 object-cover"
+          className="absolute inset-0 z-10 object-cover transition-transform duration-300 group-hover:scale-105"
         />
       </motion.button>
     </>
