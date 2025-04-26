@@ -1,7 +1,9 @@
 "use client";
 
-import { motion } from "motion/react";
+import { useState, useRef, useEffect } from "react";
+import { motion, useAnimationControls } from "motion/react";
 import { cn } from "@/lib/utils";
+import { Pause, Play } from "lucide-react";
 export const ThreeDMarquee = ({
   images,
   className,
@@ -9,134 +11,169 @@ export const ThreeDMarquee = ({
   images: string[];
   className?: string;
 }) => {
-  // Split the images array into 4 equal parts
-  const chunkSize = Math.ceil(images.length / 4);
-  const chunks = Array.from({ length: 4 }, (_, colIndex) => {
-    const start = colIndex * chunkSize;
-    return images.slice(start, start + chunkSize);
-  });
+  const [isPaused, setIsPaused] = useState(false);
+  const firstRowControls = useAnimationControls();
+  const secondRowControls = useAnimationControls();
+  const containerRef = useRef<HTMLDivElement>(null);
+  
+  // Duplicate and shuffle images for variety
+  const allImages = [...images, ...images, ...images];
+  // Split the images into two rows for the marquee
+  const firstRow = allImages.slice(0, Math.ceil(allImages.length / 2));
+  const secondRow = allImages.slice(Math.ceil(allImages.length / 2));
+  
+  // Toggle pause/play
+  const togglePause = () => {
+    setIsPaused(!isPaused);
+    if (!isPaused) {
+      firstRowControls.stop();
+      secondRowControls.stop();
+    } else {
+      firstRowControls.start("animate");
+      secondRowControls.start("animate");
+    }
+  };
+  
+  useEffect(() => {
+    if (!isPaused) {
+      firstRowControls.start("animate");
+      secondRowControls.start("animate");
+    }
+  }, [firstRowControls, secondRowControls, isPaused]);
+  
   return (
     <div
+      ref={containerRef}
       className={cn(
-        "mx-auto block h-[600px] overflow-hidden rounded-2xl max-sm:h-100",
+        "relative mx-auto block h-[70vh] overflow-hidden rounded-b-[40px]",
         className,
       )}
     >
-      <div className="flex size-full items-center justify-center">
-        <div className="size-[1720px] shrink-0 scale-50 sm:scale-75 lg:scale-100">
-          <div
-            style={{
-              transform: "rotateX(55deg) rotateY(0deg) rotateZ(-45deg)",
+      {/* Gradient overlay for better text visibility */}
+      <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/40 to-black/90 z-[2]"></div>
+      
+      <div className="relative h-full w-full overflow-hidden">
+        {/* First row - moves right to left */}
+        <div className="mt-8 mb-4">
+          <motion.div
+            className="flex w-max"
+            animate={firstRowControls}
+            variants={{
+              animate: {
+                x: ["0%", "-50%"],
+                transition: {
+                  x: {
+                    duration: 180,
+                    repeat: Infinity,
+                    ease: "linear",
+                    repeatType: "loop"
+                  },
+                },
+              },
             }}
-            className="relative top-96 right-[50%] grid size-full origin-top-left grid-cols-5 gap-8 transform-3d"
+            initial="animate"
           >
-            {chunks.map((subarray, colIndex) => (
-              <motion.div
-                animate={{ y: colIndex % 2 === 0 ? 100 : -100 }}
-                transition={{
-                  duration: colIndex % 2 === 0 ? 6 : 8,
-                  repeat: Infinity,
-                  repeatType: "reverse",
-                }}
-                key={colIndex + "marquee"}
-                className="flex flex-col items-start gap-8"
-              >
-                <GridLineVertical className="-left-4" offset="80px" />
-                {subarray.map((image, imageIndex) => (
-                  <div className="relative" key={imageIndex + image}>
-                    <GridLineHorizontal className="-top-4" offset="20px" />
-                    <motion.img
-                      whileHover={{
-                        y: -10,
-                      }}
-                      transition={{
-                        duration: 0.3,
-                        ease: "easeInOut",
-                      }}
-                      key={imageIndex + image}
-                      src={image}
-                      alt={`Image ${imageIndex + 1}`}
-                      className="aspect-[400/600] rounded-lg object-cover ring ring-gray-950/5 hover:shadow-2xl"
-                      width={300}
-                      height={450}
-                    />
-                  </div>
-                ))}
-              </motion.div>
-            ))}
-          </div>
+            {/* First copy of images */}
+            <div className="flex">
+              {firstRow.map((image, idx) => (
+                <div 
+                  key={`first-row-1-${idx}`} 
+                  className="relative flex-shrink-0 px-1"
+                >
+                  <img
+                    src={image}
+                    alt={`Netflix content ${idx + 1}`}
+                    className="h-[280px] w-[180px] object-cover rounded-md"
+                  />
+                </div>
+              ))}
+            </div>
+            {/* Duplicate to ensure continuous flow */}
+            <div className="flex">
+              {firstRow.map((image, idx) => (
+                <div 
+                  key={`first-row-2-${idx}`} 
+                  className="relative flex-shrink-0 px-1"
+                >
+                  <img
+                    src={image}
+                    alt={`Netflix content ${idx + 1}`}
+                    className="h-[280px] w-[180px] object-cover rounded-md"
+                  />
+                </div>
+              ))}
+            </div>
+          </motion.div>
+        </div>
+        
+        {/* Second row - also moves right to left but at different speed */}
+        <div className="mb-8">
+          <motion.div
+            className="flex w-max"
+            animate={secondRowControls}
+            variants={{
+              animate: {
+                x: ["0%", "-50%"],
+                transition: {
+                  x: {
+                    duration: 200, // Different speed for visual interest
+                    repeat: Infinity,
+                    ease: "linear",
+                    repeatType: "loop"
+                  },
+                },
+              },
+            }}
+            initial="animate"
+          >
+            {/* First copy of images */}
+            <div className="flex">
+              {secondRow.map((image, idx) => (
+                <div 
+                  key={`second-row-1-${idx}`} 
+                  className="relative flex-shrink-0 px-1"
+                >
+                  <img
+                    src={image}
+                    alt={`Netflix content ${idx + 1}`}
+                    className="h-[280px] w-[180px] object-cover rounded-md"
+                  />
+                </div>
+              ))}
+            </div>
+            {/* Duplicate to ensure continuous flow */}
+            <div className="flex">
+              {secondRow.map((image, idx) => (
+                <div 
+                  key={`second-row-2-${idx}`} 
+                  className="relative flex-shrink-0 px-1"
+                >
+                  <img
+                    src={image}
+                    alt={`Netflix content ${idx + 1}`}
+                    className="h-[280px] w-[180px] object-cover rounded-md"
+                  />
+                </div>
+              ))}
+            </div>
+          </motion.div>
         </div>
       </div>
+      
+      {/* Pause/Play button */}
+      <button 
+        onClick={togglePause}
+        className="absolute bottom-4 right-4 z-10 bg-black/50 p-2 rounded-full hover:bg-black/70 transition-colors"
+        aria-label={isPaused ? "Play" : "Pause"}
+      >
+        {isPaused ? (
+          <Play className="h-6 w-6 text-white" />
+        ) : (
+          <Pause className="h-6 w-6 text-white" />
+        )}
+      </button>
     </div>
   );
 };
 
-const GridLineHorizontal = ({
-  className,
-  offset,
-}: {
-  className?: string;
-  offset?: string;
-}) => {
-  return (
-    <div
-      style={
-        {
-          "--background": "#ffffff",
-          "--color": "rgba(0, 0, 0, 0.2)",
-          "--height": "1px",
-          "--width": "5px",
-          "--fade-stop": "90%",
-          "--offset": offset || "200px", //-100px if you want to keep the line inside
-          "--color-dark": "rgba(255, 255, 255, 0.2)",
-          maskComposite: "exclude",
-        } as React.CSSProperties
-      }
-      className={cn(
-        "absolute left-[calc(var(--offset)/2*-1)] h-[var(--height)] w-[calc(100%+var(--offset))]",
-        "bg-[linear-gradient(to_right,var(--color),var(--color)_50%,transparent_0,transparent)]",
-        "[background-size:var(--width)_var(--height)]",
-        "[mask:linear-gradient(to_left,var(--background)_var(--fade-stop),transparent),_linear-gradient(to_right,var(--background)_var(--fade-stop),transparent),_linear-gradient(black,black)]",
-        "[mask-composite:exclude]",
-        "z-30",
-        "dark:bg-[linear-gradient(to_right,var(--color-dark),var(--color-dark)_50%,transparent_0,transparent)]",
-        className,
-      )}
-    ></div>
-  );
-};
-
-const GridLineVertical = ({
-  className,
-  offset,
-}: {
-  className?: string;
-  offset?: string;
-}) => {
-  return (
-    <div
-      style={
-        {
-          "--background": "#ffffff",
-          "--color": "rgba(0, 0, 0, 0.2)",
-          "--height": "5px",
-          "--width": "1px",
-          "--fade-stop": "90%",
-          "--offset": offset || "150px", //-100px if you want to keep the line inside
-          "--color-dark": "rgba(255, 255, 255, 0.2)",
-          maskComposite: "exclude",
-        } as React.CSSProperties
-      }
-      className={cn(
-        "absolute top-[calc(var(--offset)/2*-1)] h-[calc(100%+var(--offset))] w-[var(--width)]",
-        "bg-[linear-gradient(to_bottom,var(--color),var(--color)_50%,transparent_0,transparent)]",
-        "[background-size:var(--width)_var(--height)]",
-        "[mask:linear-gradient(to_top,var(--background)_var(--fade-stop),transparent),_linear-gradient(to_bottom,var(--background)_var(--fade-stop),transparent),_linear-gradient(black,black)]",
-        "[mask-composite:exclude]",
-        "z-30",
-        "dark:bg-[linear-gradient(to_bottom,var(--color-dark),var(--color-dark)_50%,transparent_0,transparent)]",
-        className,
-      )}
-    ></div>
-  );
-};
+// We don't need the grid lines for the Netflix style marquee

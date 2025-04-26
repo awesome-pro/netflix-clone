@@ -14,22 +14,22 @@ const FEATURE_ITEMS: FeatureItem[] = [
   {
     title: "Enjoy on your TV",
     description: "Watch on smart TVs, PlayStation, Xbox, Chromecast, Apple TV, Blu-ray players and more.",
-    icon: "/tv.png"
+    icon: "/t.png"
   },
   {
     title: "Download your shows to watch offline",
     description: "Save your favourites easily and always have something to watch.",
-    icon: "/download.png"
+    icon: "/d.png"
   },
   {
     title: "Watch everywhere",
     description: "Stream unlimited movies and TV shows on your phone, tablet, laptop and TV.",
-    icon: "/device.png"
+    icon: "/p.png"
   },
   {
     title: "Create profiles for kids",
     description: "Send kids on adventures with their favourite characters in a space made just for them — free with your membership.",
-    icon: "/kid.png"
+    icon: "/c.png"
   }
 ];
 
@@ -69,7 +69,7 @@ function FeatureCard({
   return (
     <Card 
       ref={ref}
-      className="bg-[#222]/50 rounded-lg overflow-hidden p-4 h-full flex flex-col transition-all duration-300 hover:scale-105"
+      className="bg-gradient-to-b from-gray-800 to-gray-900 rounded-lg overflow-hidden p-4 h-full flex flex-col transition-all duration-300 hover:scale-105"
     >
       <h3 className="text-xl font-bold mb-3">
         {title}
@@ -81,8 +81,8 @@ function FeatureCard({
         <Image 
           src={icon} 
           alt={title}
-          width={80}
-          height={80}
+          width={60}
+          height={60}
           className="object-contain"
         />
       </div>

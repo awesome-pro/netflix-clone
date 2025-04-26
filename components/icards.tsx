@@ -1,8 +1,10 @@
 "use client";
 
-import React from "react";
+import React, { useRef, useState } from "react";
 import { Carousel, Card } from "@/components/ui/apple-cards-carousel";
 import Image from "next/image";
+import { Button } from "./ui/button";
+import { ChevronRight } from "lucide-react";
 
 export default function MovieCards() {
   const cards = movieData.map((card, index) => (
@@ -11,48 +13,34 @@ export default function MovieCards() {
 
   return (
     <div className="w-full h-full py-10 bg-black">
-      <h2 className="max-w-7xl pl-4 mx-auto text-xl md:text-2xl font-bold text-white font-sans flex items-center">
-        Trending Now
-        <span className="ml-2 text-xs text-gray-400 font-normal hidden md:inline">Movies & TV</span>
-      </h2>
-      <Carousel items={cards} />
+      <div className="max-w-7xl mx-auto">
+        <h2 className="pl-4 text-2xl md:text-3xl font-bold text-white font-sans flex items-center">
+          Trending Now
+        </h2>
+        <Carousel items={cards} />
+      </div>
     </div>
   );
 }
 
 const MovieContent = ({ movie }: { movie: any }) => {
+  const [email, setEmail] = useState("");
+  const [isFocused, setIsFocused] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const handleFocus = () => {
+    setIsFocused(true);
+  };
+
+  const handleBlur = () => {
+    setIsFocused(false);
+  };
+
   return (
     <>
-      <div className="mb-8">
-        <div className="aspect-video w-full overflow-hidden rounded-md mb-4">
-          <Image
-            src={movie.src}
-            alt={movie.title}
-            height={720}
-            width={1280}
-            className="w-full object-cover"
-          />
-        </div>
-        
-        <div className="flex gap-3 mb-6">
-          <button className="bg-white text-black px-8 py-2 rounded-md flex items-center gap-2 font-medium hover:bg-opacity-90 transition-colors">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <polygon points="5 3 19 12 5 21 5 3"></polygon>
-            </svg>
-            Play
-          </button>
-          <button className="bg-gray-600 text-white px-6 py-2 rounded-md flex items-center gap-2 font-medium hover:bg-opacity-90 transition-colors">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
-            </svg>
-            My List
-          </button>
-        </div>
-        
+      <div className="mb-4">
         <div className="text-gray-200">
-          <p className="text-lg mb-4">{movie.description || 'No description available.'}</p>
-          
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-4 text-sm">
             <div>
               <p className="text-gray-400 mb-1">Cast:</p>
               <p>John Doe, Jane Smith, Robert Johnson</p>
@@ -66,6 +54,35 @@ const MovieContent = ({ movie }: { movie: any }) => {
               <p>Suspenseful, Dark, Gritty</p>
             </div>
           </div>
+        </div>
+        <div className="flex flex-col md:flex-row gap-2 justify-center items-center lg:max-w-[600px] mx-auto mt-10">
+          {/* Custom input with floating label */}
+          <div className="relative w-full md:flex-grow">
+            <div className={`relative h-12 md:h-16 w-full md:w-[400px] rounded-full overflow-hidden ${isFocused ? 'ring-2 ring-white' : ''}`}>
+              <input
+                ref={inputRef}
+                type="email"
+                id="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                onFocus={handleFocus}
+                onBlur={handleBlur}
+                className="h-full w-full md:w-[400px] px-4 pt-5 pb-2 bg-gray-600/60 backdrop-blur-sm text-white border border-gray-600 text-lg outline-none rounded-full"
+              />
+              <label 
+                htmlFor="email"
+                className={`absolute text-gray-400 duration-150 transform ${isFocused ? 'text-xs top-2 left-4' : 'text-lg top-1/2 -translate-y-1/2 left-4'}`}
+              >
+                Email address
+              </label>
+            </div>
+          </div>
+          <Button 
+            className="h-12 md:h-16 bg-red-600 hover:bg-red-700 text-white px-6 md:px-8 text-xl font-semibold transition-all duration-300 ease-in-out rounded-full w-full md:w-[200px]"
+          >
+            Get Started
+            <ChevronRight className="ml-2 w-6 h-6" />
+          </Button>
         </div>
       </div>
     </>
@@ -136,7 +153,7 @@ const movieData = [
   {
     category: "Comedy, Drama",
     title: "The Queen's Gambit",
-    src: "https://images.unsplash.com/photo-1581005289513-ee86f5769f6f?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    src: "https://images.unsplash.com/photo-1745572601167-720dc57db0d8?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxmZWF0dXJlZC1waG90b3MtZmVlZHwyfHx8ZW58MHx8fHx8",
     year: "2020",
     duration: "Limited Series",
     rating: "16+",
@@ -146,6 +163,36 @@ const movieData = [
       src: "https://images.unsplash.com/photo-1581005289513-ee86f5769f6f?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       category: "Comedy, Drama",
       description: "In a 1950s orphanage, a young girl reveals an astonishing talent for chess and begins an unlikely journey to stardom while grappling with addiction."
+    }} />,
+  },
+  {
+    category: "Action, Fantasy",
+    title: "The Witcher",
+    src: "https://images.unsplash.com/photo-1518709766631-a6a7f45921c3?q=80&w=2062&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    year: "2019",
+    duration: "Series",
+    rating: "18+",
+    description: "Geralt of Rivia, a mutated monster-hunter for hire, journeys toward his destiny in a turbulent world where people often prove more wicked than beasts.",
+    content: <MovieContent movie={{ 
+      title: "The Witcher", 
+      src: "https://images.unsplash.com/photo-1518709766631-a6a7f45921c3?q=80&w=2062&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      category: "Action, Fantasy",
+      description: "Geralt of Rivia, a mutated monster-hunter for hire, journeys toward his destiny in a turbulent world where people often prove more wicked than beasts."
+    }} />,
+  },
+  {
+    category: "Action, Fantasy",
+    title: "The Witcher",
+    src: "https://images.unsplash.com/photo-1518709766631-a6a7f45921c3?q=80&w=2062&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    year: "2019",
+    duration: "Series",
+    rating: "18+",
+    description: "Geralt of Rivia, a mutated monster-hunter for hire, journeys toward his destiny in a turbulent world where people often prove more wicked than beasts.",
+    content: <MovieContent movie={{ 
+      title: "The Witcher", 
+      src: "https://images.unsplash.com/photo-1518709766631-a6a7f45921c3?q=80&w=2062&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      category: "Action, Fantasy",
+      description: "Geralt of Rivia, a mutated monster-hunter for hire, journeys toward his destiny in a turbulent world where people often prove more wicked than beasts."
     }} />,
   },
   {
